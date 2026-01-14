@@ -1,4 +1,4 @@
-package com.example.ticker;
+package ticker;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -9,7 +9,6 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.SaveMode;
 
-import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
 public class Aggregator {
