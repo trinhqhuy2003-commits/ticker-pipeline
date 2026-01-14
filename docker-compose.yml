@@ -55,7 +55,7 @@ services:
     restart: always
 
   processing:
-    build: ./processing
+    build: .
     container_name: processing
     depends_on:
       - kafka
