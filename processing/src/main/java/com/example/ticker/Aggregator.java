@@ -29,18 +29,16 @@ public class Aggregator {
                 SparkSession spark = SparkSession
                                 .builder()
                                 .appName("TickerAggregator")
-                                .master("local[*]") // In production/cluster, this would be set via spark-submit
+                                .master("local[*]")
                                 .getOrCreate();
 
                 spark.sparkContext().setLogLevel("WARN");
 
-                // Define schema for JSON data
                 StructType schema = new StructType()
                                 .add("symbol", DataTypes.StringType)
                                 .add("price", DataTypes.DoubleType)
                                 .add("timestamp", DataTypes.LongType);
 
-                // Read from Kafka
                 Dataset<Row> df = spark
                                 .readStream()
                                 .format("kafka")
@@ -49,14 +47,12 @@ public class Aggregator {
                                 .option("startingOffsets", "latest")
                                 .load();
 
-                // Parse JSON and convert timestamp
                 Dataset<Row> parsedDf = df.selectExpr("CAST(value AS STRING)")
                                 .select(functions.from_json(functions.col("value"), schema).as("data"))
                                 .select("data.*")
                                 .withColumn("timestamp",
                                                 functions.to_timestamp(functions.col("timestamp").divide(1000)));
 
-                // Aggregate 5-minute tumbling window
                 Dataset<Row> aggregatedDf = parsedDf
                                 .groupBy(
                                                 functions.window(functions.col("timestamp"), "5 minutes"),
@@ -68,7 +64,6 @@ public class Aggregator {
                                                 functions.col("window.end").as("window_end"),
                                                 functions.col("avg_price"));
 
-                // Write content to Postgres
                 StreamingQuery query = aggregatedDf.writeStream()
                                 .outputMode("update")
                                 .foreachBatch((batchDf, batchId) -> {

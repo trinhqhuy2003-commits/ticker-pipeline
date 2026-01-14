@@ -4,7 +4,7 @@ import json
 import yfinance as yf
 from kafka import KafkaProducer
 
-# Configuration
+
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
 TICKER_SYMBOL = os.environ.get('TICKER_SYMBOL', 'BTC-USD')
 TOPIC_NAME = 'ticker_prices'
@@ -25,7 +25,7 @@ def create_producer():
 def fetch_price(ticker):
     try:
         data = yf.Ticker(ticker)
-        # fast_info is often faster/more reliable for current price than .info
+
         price = data.fast_info['last_price']
         return price
     except Exception as e:
@@ -52,8 +52,6 @@ def main():
             except Exception as e:
                 print(f"Error sending to Kafka: {e}")
         
-        # Sleep for a bit to avoid hitting rate limits too hard
-        # yfinance can be touchy, 5 seconds is reasonably safe
         time.sleep(5)
 
 if __name__ == "__main__":
