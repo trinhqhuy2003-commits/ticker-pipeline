@@ -1,0 +1,7 @@
+__pycache__/
+*.class
+target/
+.DS_Store
+.idea/
+venv/
+postgres_data/
